@@ -64,10 +64,10 @@ public class HolidayBot extends TelegramLongPollingBot {
     }
 
     private void getCities(long charId) {
-        String result = "Города: /n";
+        String result = "Города: /n ";
         for (Map.Entry<String, String> строчка : cities.entrySet()) {
             result += строчка.getKey() + " - " + строчка.getValue();
-            result += "/n";
+            result += " /n ";
         }
         sendMessage(result, charId);
     }
