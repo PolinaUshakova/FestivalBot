@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Nani-bot.iml" filepath="$PROJECT_DIR$/.idea/modules/Nani-bot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Nani-bot_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Nani-bot_main.iml" group="Nani-bot" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Nani-bot_test.iml" filepath="$PROJECT_DIR$/.idea/modules/Nani-bot_test.iml" group="Nani-bot" />
+    </modules>
+  </component>
+</project>
