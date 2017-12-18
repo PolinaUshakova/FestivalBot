@@ -6,11 +6,15 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HolidayBot extends TelegramLongPollingBot {
     
     ArrayList<String> users = new ArrayList<>();
+    HashMap<String, String> cities = new HashMap<>();
+    boolean addMode = false;
     
     @Override
     public void onUpdateReceived(Update update) {
@@ -19,29 +23,28 @@ public class HolidayBot extends TelegramLongPollingBot {
             String message = update.getMessage().getText();
             int messageId = update.getMessage().getMessageId();
 
-            if (message.equals("/unregister")) {
-                User user = update.getMessage().getFrom();
-                users.remove(user.getUserName());
-            } else if (message.equals("/register")) {
-                User user = update.getMessage().getFrom();
-                users.add(user.getUserName());
-            } else if (message.equals("/getRandomUser")) {
-                 if (users.size() > 0) {
-                    String randomUserName = users.get((int) (Math.random() * users.size()));
-                    sendMessage("Жму вам руку, @" + randomUserName + ", я приятно удивлен)0)))0)00))0 Вы победили!", chatId, messageId);
-                } else {
-                     sendMessage("Никто не хочет написать мне (9(((99((", chatId, messageId);
-                 }
+
+            if (addMode) {
+                addCity(message,chatId);
+                addMode = false;
             } else {
-                sendMessage(message, chatId, messageId);
+                switch (message) {
+                    case "/addCity":
+                        sendMessage("Какой город?", chatId);
+                        addMode = true;
+                        break;
+                    case "/getCities":
+                        getCities(chatId);
+                        break;
+                    default:
+                        sendMessage(message, chatId, messageId);
+                }
+
             }
-
-        } 
+        }
     }
 
 
-    private void sendPhoto(long chatId, String fileId) {
-    }
 
     @Override
     public String getBotUsername() {
@@ -52,6 +55,40 @@ public class HolidayBot extends TelegramLongPollingBot {
     public String getBotToken() {
         return "471316058:AAFcgNqAFib33rtld5WhNu1-e7Ktd4Gp_gU";
     }
+
+
+    private void addCity(String text, long charId) {
+        String[] кусочки = text.split(" ");
+        cities.put(кусочки[0], кусочки[1]);
+        sendMessage("Город добавлен", charId);
+    }
+
+    private void getCities(long charId) {
+        String result = "Города: /n";
+        for (Map.Entry<String, String> строчка : cities.entrySet()) {
+            result += строчка.getKey() + " - " + строчка.getValue();
+            result += "/n";
+        }
+        sendMessage(result, charId);
+    }
+
+
+
+    //================================================================================================================
+
+    private void sendMessage(String text, long chatId) {
+        SendMessage sendMessage = new SendMessage()
+                .setText(text)
+                .setChatId(chatId);
+
+
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void sendMessage(String text, long chatId, int messageId) {
         SendMessage sendMessage = new SendMessage()
