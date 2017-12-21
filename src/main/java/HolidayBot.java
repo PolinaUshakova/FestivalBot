@@ -1,21 +1,28 @@
 import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.objects.PhotoSize;
 import org.telegram.telegrambots.api.objects.Update;
-import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class HolidayBot extends TelegramLongPollingBot {
     
     ArrayList<String> users = new ArrayList<>();
-    HashMap<String, String> cities = new HashMap<>();
-    boolean addMode = false;
-    
+    HashMap<String, String> holidays = new HashMap<>();
+    boolean feastMode = false;
+
+    public HolidayBot() {
+        holidays.put("23 февраля", "В России отмечается День Защитника Отечества.");
+        holidays.put("1 января", "Более чем в 12 странах мира, отмечают Новый Год.");
+        holidays.put("7 января", "В странах, где исповедуют христианство, отмечают Рождество. Но в некоторых странах, например, в Швеции, Норвегии, Финляндии, Франции и др, Рождество отмечают 25 декаюря!");
+        holidays.put("16 октября", "Нициональный праздник в Польше. В этот день отмечается день памяти Иоанна Павла 2 - первого польского папы.");
+        holidays.put("", "");
+        holidays.put("", "");
+    }
+
+
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage()) {
@@ -24,17 +31,21 @@ public class HolidayBot extends TelegramLongPollingBot {
             int messageId = update.getMessage().getMessageId();
 
 
-            if (addMode) {
-                addCity(message,chatId);
-                addMode = false;
+            if (feastMode) {
+                String holiday = holidays.get(message);
+                sendMessage("В этот день " + holiday, chatId);
+                feastMode = false;
             } else {
                 switch (message) {
-                    case "/addCity":
-                        sendMessage("Какой город?", chatId);
-                        addMode = true;
+                    case "/getHoliday":
+                        getHoliday(chatId);
+                        sendMessage("Какая дата тебя интересует?", chatId);
+                        feastMode = true;
                         break;
-                    case "/getCities":
-                        getCities(chatId);
+                    case "/addHoliday":
+                        addHoliday(message, chatId);
+                        sendMessage("Скажи, пожалуйста, дату, а затем сам праздник", chatId);
+                        feastMode = true;
                         break;
                     default:
                         sendMessage(message, chatId, messageId);
@@ -57,24 +68,19 @@ public class HolidayBot extends TelegramLongPollingBot {
     }
 
 
-    private void addCity(String text, long charId) {
+    private void addHoliday(String text, long charId) {
         String[] кусочки = text.split(" ");
-        cities.put(кусочки[0], кусочки[1]);
-        sendMessage("Город добавлен", charId);
+        holidays.put(кусочки[0], кусочки[1]);
+        sendMessage("Праздник добавлен. Спасибо за помощь.)", charId);
     }
 
-    private void getCities(long charId) {
-        String result = "Города: /n ";
-        for (Map.Entry<String, String> строчка : cities.entrySet()) {
-            result += строчка.getKey() + " - " + строчка.getValue();
-            result += " /n ";
-        }
-        sendMessage(result, charId);
+    private void getHoliday(long charId) {
+//
     }
 
 
 
-    //================================================================================================================
+    //===============================================================================================================================
 
     private void sendMessage(String text, long chatId) {
         SendMessage sendMessage = new SendMessage()
