@@ -12,14 +12,14 @@ public class HolidayBot extends TelegramLongPollingBot {
     ArrayList<String> users = new ArrayList<>();
     HashMap<String, String> holidays = new HashMap<>();
     boolean feastMode = false;
+    boolean addHolidayMode = false;
 
     public HolidayBot() {
-        holidays.put("23 февраля", "В России отмечается День Защитника Отечества.");
-        holidays.put("1 января", "Более чем в 12 странах мира, отмечают Новый Год.");
-        holidays.put("7 января", "В странах, где исповедуют христианство, отмечают Рождество. Но в некоторых странах, например, в Швеции, Норвегии, Финляндии, Франции и др, Рождество отмечают 25 декаюря!");
-        holidays.put("16 октября", "Нициональный праздник в Польше. В этот день отмечается день памяти Иоанна Павла 2 - первого польского папы.");
-        holidays.put("", "");
-        holidays.put("", "");
+        holidays.put("23 февраля", "в России отмечается День Защитника Отечества.");
+        holidays.put("1 января", "более чем в 12 странах мира, отмечают Новый Год.");
+        holidays.put("7 января", "в странах, где исповедуют христианство, отмечают Рождество. Но в некоторых странах, например, в Швеции, Норвегии, Финляндии, Франции и др, Рождество отмечают 25 декабря!");
+        holidays.put("16 октября", "национальный праздник в Польше. В этот день отмечается день памяти Иоанна Павла 2 - первого польского папы.");
+        holidays.put("8 марта", "в России отмечают женский день.");
     }
 
 
@@ -35,25 +35,29 @@ public class HolidayBot extends TelegramLongPollingBot {
                 String holiday = holidays.get(message);
                 sendMessage("В этот день " + holiday, chatId);
                 feastMode = false;
+            } else if (addHolidayMode) {
+                addHoliday(message, chatId);
+             // sendMessage("Праздник добавлен " + message, chatId);
+                addHolidayMode = false;
             } else {
-                switch (message) {
-                    case "/getHoliday":
-                        getHoliday(chatId);
-                        sendMessage("Какая дата тебя интересует?", chatId);
-                        feastMode = true;
-                        break;
-                    case "/addHoliday":
-                        addHoliday(message, chatId);
-                        sendMessage("Скажи, пожалуйста, дату, а затем сам праздник", chatId);
-                        feastMode = true;
-                        break;
-                    default:
-                        sendMessage(message, chatId, messageId);
-                }
+                    switch (message) {
+                        case "/getHoliday":
+                            getHoliday(chatId);
+                            sendMessage("Какая дата тебя интересует?", chatId);
+                            feastMode = true;
+                            break;
+                        case "/addHoliday":
+                            sendMessage("Скажи, пожалуйста, дату, а затем сам праздник", chatId);
+                            addHolidayMode = true;
+                            break;
+                        default:
+                            sendMessage(message, chatId, messageId);
+                    }
 
+                }
             }
         }
-    }
+
 
 
 
@@ -69,7 +73,7 @@ public class HolidayBot extends TelegramLongPollingBot {
 
 
     private void addHoliday(String text, long charId) {
-        String[] кусочки = text.split(" ");
+        String[] кусочки = text.split(" - ");
         holidays.put(кусочки[0], кусочки[1]);
         sendMessage("Праздник добавлен. Спасибо за помощь.)", charId);
     }
